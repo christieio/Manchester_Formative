@@ -11,32 +11,59 @@ London_Health <- read_sas("london ward data health.sas7bdat")
 London_socio <- read_sav("London ward data socioeconomic.sav")
 #2 have ward name, 2 have ward code, district just has district and district code. 
 
+# Checking column names
+colnames(London_Dist)
+colnames(London_Demo)
+colnames(London_Envi)
+colnames(London_Health)
+colnames(London_socio)
+
+
 # Changing column name for ease
 names(London_Demo)[names(London_Demo) == "ï..Wardname"] <- "Wardname"
+names(London_Dist)[names(London_Dist) == "ï..District"] <- "District"
+names(London_Envi)[names(London_Envi) == "ï..Wardcode"] <- "Wardcode"
 
-#Merge health and demo on wardname
-total <- merge(London_Health, London_Demo, 
-               by = "Wardname")
 
-London_socio$Districtcode <- substr(London_socio$Wardcode, 0, 4)
+# Checking missing data
+sum(is.na(London_Demo))
+sum(is.na(London_Dist))
+sum(is.na(London_Envi))
+sum(is.na(London_Health))
+sum(is.na(London_socio))
 
 # Removing empty rows
+which(is.na(London_socio$hhSocialRented))
 London_socio <- London_socio[-c(622:657),]
+sum(is.na(London_socio))
+
+# Extracting district code from Wardcode
+London_socio$Districtcode <- substr(London_socio$Wardcode, 0, 4)
+
 
 # Adding district name to health
 London_Health$District <- sapply(strsplit(London_Health$Wardname, "-", fixed = T), function(x) (x[1]))
+#Get rid of spaces after district 
+London_Health$District <- trimws(London_Health$District, "r")
+unique(London_Health$District)
 
-#Changing district name for intuitiveness 
-names(London_Dist)[names(London_Dist) == "Dist"] <- "District"
+#Merge health and demo on wardname
+total <- merge(London_Health, London_Demo, 
+               by = "Wardname", all = TRUE)
+
+# Merge Socio and Envi on Wardcode
+Socio_Envi <- merge(London_socio, London_Envi, 
+                    by = "Wardcode", all = TRUE)
+
 
 #Get rid of spaces before district code 
 London_Dist$Districtcode <- gsub('\\s+', '', London_Dist$Districtcode)
-London_Dist
+London_Dist$Districtcode
 
-#Join london dist to london socio
-library(dplyr)
-df= London_Dist %>% left_join(London_socio,by="Districtcode")
-df
+# Merging Socioeconomic, Environment and District codes by Districtcode
+Merged <- merge(x = Socio_Envi, y = London_Dist, by = "Districtcode", all.x = TRUE)
 
-names(London_Envi)[names(London_Envi) == "ï..Wardcode"] <- "Wardcode"
+# Merging all data together by district name
+All_data <- merge(x = Merged, y = total, by = c("District", "Population2011Census"), all = TRUE)
+
 
