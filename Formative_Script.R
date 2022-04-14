@@ -11,14 +11,7 @@ London_Health <- read_sas("london ward data health.sas7bdat")
 London_socio <- read_sav("London ward data socioeconomic.sav")
 #2 have ward name, 2 have ward code, district just has district and district code. 
 
-
-
 # Changing column name for ease
-names(London_Demo)[names(London_Demo) == "ï..Wardname"] <- "Wardname"
-
-# Merging London_Health and London_Demo
-
-#Change name of col for intuitiveness
 names(London_Demo)[names(London_Demo) == "ï..Wardname"] <- "Wardname"
 
 #Merge health and demo on wardname
@@ -33,14 +26,16 @@ London_socio <- London_socio[-c(622:657),]
 # Adding district name to health
 London_Health$District <- sapply(strsplit(London_Health$Wardname, "-", fixed = T), function(x) (x[1]))
 
-
+#Changing district name for intuitiveness 
 names(London_Dist)[names(London_Dist) == "Dist"] <- "District"
 
-#install.packages("dplyr")
-library(dplyr)
-#full join health onto dist
-#df= London_Dist %>% anti_join(London_Health,by="District")
-#df
+#Get rid of spaces before district code 
+London_Dist$Districtcode <- gsub('\\s+', '', London_Dist$Districtcode)
+London_Dist
 
-test = merge(x = London_Dist, y = London_Health, by = NULL)
-test
+#Join london dist to london socio
+library(dplyr)
+df= London_Dist %>% left_join(London_socio,by="Districtcode")
+df
+
+
