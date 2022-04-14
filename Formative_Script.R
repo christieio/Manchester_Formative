@@ -10,12 +10,17 @@ London_Health <- read_sas("london ward data health.sas7bdat")
 London_socio <- read_sav("London ward data socioeconomic.sav")
 
 
-
+# Changing column name for ease
 names(London_Demo)[names(London_Demo) == "ï..Wardname"] <- "Wardname"
 
+# Merging London_Health and London_Demo
 total <- merge(London_Health, London_Demo, 
                by = "Wardname")
 
 #2 have ward name, 2 have ward code, district just has district and district code. 
 
+London_socio$Districtcode <- substr(London_socio$Wardcode, 0, 4)
+total_2 <- merge(London_Dist, London_socio, 
+               by = "Districtcode")
 
+combine <- rbind.fill(London_Dist, London_socio)
