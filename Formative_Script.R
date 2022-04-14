@@ -1,6 +1,6 @@
 #######################FORMATIVE ASSESSMENT#####################################
 
-install.packages("haven")
+#install.packages("haven")
 library(haven)
 
 #Read in data sets
@@ -25,10 +25,6 @@ names(London_Demo)[names(London_Demo) == "ï..Wardname"] <- "Wardname"
 total <- merge(London_Health, London_Demo, 
                by = "Wardname")
 
-#merge merged data above to environment on population census
-newmerge <- merge(total, London_Envi, 
-               by = "Population2011Census")
-
 London_socio$Districtcode <- substr(London_socio$Wardcode, 0, 4)
 
 # Removing empty rows
@@ -37,3 +33,11 @@ London_socio <- London_socio[-c(622:657),]
 # Adding district name to health
 London_Health$District <- sapply(strsplit(London_Health$Wardname, "-", fixed = T), function(x) (x[1]))
 
+
+names(London_Dist)[names(London_Dist) == "Dist"] <- "District"
+
+#install.packages("dplyr")
+library(dplyr)
+#full join health onto dist
+df= London_Dist %>% full_join(London_Health,by="District")
+df
