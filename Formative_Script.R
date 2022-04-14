@@ -38,4 +38,5 @@ library(dplyr)
 df= London_Dist %>% left_join(London_socio,by="Districtcode")
 df
 
+names(London_Envi)[names(London_Envi) == "ï..Wardcode"] <- "Wardcode"
 
