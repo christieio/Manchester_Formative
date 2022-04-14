@@ -30,7 +30,10 @@ newmerge <- merge(total, London_Envi,
                by = "Population2011Census")
 
 London_socio$Districtcode <- substr(London_socio$Wardcode, 0, 4)
-total_2 <- merge(London_Dist, London_socio, 
-               by = "Districtcode")
 
-combine <- rbind.fill(London_Dist, London_socio)
+# Removing empty rows
+London_socio <- London_socio[-c(622:657),]
+
+# Adding district name to health
+London_Health$District <- sapply(strsplit(London_Health$Wardname, "-", fixed = T), function(x) (x[1]))
+
