@@ -19,5 +19,7 @@ total <- merge(London_Health, London_Demo,
 
 #2 have ward name, 2 have ward code, district just has district and district code. 
 
+newmerge <- merge(total, London_Envi, 
+               by = "Population2011Census")
 
 
