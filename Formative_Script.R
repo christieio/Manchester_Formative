@@ -19,8 +19,5 @@ total <- merge(London_Health, London_Demo,
 
 #2 have ward name, 2 have ward code, district just has district and district code. 
 
-#Compare datasets
-install.packages("arsenal")
-library(arsenal)
-comparedf(London_Dist, London_Health)
+
 
