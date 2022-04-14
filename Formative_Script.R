@@ -39,5 +39,8 @@ names(London_Dist)[names(London_Dist) == "Dist"] <- "District"
 #install.packages("dplyr")
 library(dplyr)
 #full join health onto dist
-df= London_Dist %>% full_join(London_Health,by="District")
-df
+#df= London_Dist %>% anti_join(London_Health,by="District")
+#df
+
+test = merge(x = London_Dist, y = London_Health, by = NULL)
+test
