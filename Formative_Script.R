@@ -80,10 +80,13 @@ London_Demo$Count <- str_count(London_Demo$Wardname, "\\w+")
 which(London_Demo$Count > 10)
 London_Error <- London_Demo[c(44,  48,  52,  77,  80,  90, 111, 126, 195, 275, 280, 297, 305),]
 
-sep <- separate(London_Error[1], col=Wardname, into=c('One', 'Two', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', 
-                                                      '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28',
-                                                      '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40',
-                                                      '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52',
-                                                      '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '64', '65'), sep='\n')
+# Separating based on areas
 sep <- str_split_fixed(London_Error$Wardname, "\n", n = 72)
-sep_2 <- str_split(sep[[1]], "\t")
+sep <- melt(sep)
+# Separating areas
+sep <- str_split_fixed(sep$value, "\t", n = 6)
+
+# Removing empty rows
+data <- sep[!apply(sep == "", 1, all),]
+# Finding missing values
+which(data[,2] =="")
