@@ -7,6 +7,14 @@ library(stringr) #for str_count
 library(tidyr)
 #install.packages("reshape")
 library(reshape)
+#install.packages("plyr")
+library(plyr) #used for rbindfill 
+#install.packages("mice")
+library(mice)
+#install.packages("corrplot")
+library(corrplot)
+#install.packages("VIM")
+library(VIM)
 
 #Read in data sets
 London_Dist <- read.csv("London District codes.csv")
@@ -40,12 +48,6 @@ sum(is.na(London_socio))
 which(is.na(London_socio$hhSocialRented))
 London_socio <- London_socio[-c(622:657),]
 sum(is.na(London_socio))
-
-
-
-
-
-
 
 # Trying to split data in Demo (THIS IS NOT FINISHED)
 #Find out how many characters are in the wardnames:
@@ -84,7 +86,10 @@ names(Data)[5] <- "NotBorninUK"
 names(Data)[6] <- "NotEnglishspeaking"
 
 # Merging changed data
-London_Demo <- rbind(London_Demo, Data)
+#London_Demo <- rbind(London_Demo, Data) #this doesn't work bc London_Demo has a dif number of cols to data.
+#Instead use rbind fill to join data which has dif nums of cols. 
+#However, this has created a fair few missing vals but should be fine in the end. 
+London_Demo = rbind.fill(London_Demo, Data)
 
 # Changing & to and
 London_Demo$Wardname <- gsub("&", "and", London_Demo$Wardname)
@@ -129,7 +134,39 @@ Merged = Socio_Envi %>% left_join(London_Dist, by=c("Districtcode"))
 #All_data <- merge(x = Merged, y = total, by = c("District", "Population2011Census"), all = TRUE)
 All_data = Merged %>% left_join(Health_Demo, by=c("District", "Population2011Census"))
 
-data
-All_data2 = All_data %>% left_join(data, by=c("Wardname"))
 
+#I think we can now drop that count column bc that's got a lot of NAs bc we only did it to one dataset. 
+All_data = subset(All_data, select = -c(Count))
+
+#Checking missing data
+sum(is.na(All_data))
+md.pattern(All_data)
+colSums(is.na(All_data))
+which(colSums(is.na(All_data))>0)
+names(which(colSums(is.na(All_data))>0))
+
+#Gonna try mean imputation on a couple cols:
+All_data$Population2011Census[is.na(All_data$Population2011Census)] <- mean(All_data$Population2011Census, na.rm = TRUE)
+All_data$Crimerate[is.na(All_data$Crimerate)] <- mean(All_data$Crimerate, na.rm = TRUE)
+All_data$Openspace[is.na(All_data$Openspace)] <- mean(All_data$Openspace, na.rm = TRUE)
+All_data$GeneralFertilityRate[is.na(All_data$GeneralFertilityRate)] <- mean(All_data$GeneralFertilityRate, na.rm = TRUE)
+All_data$Malelifeexpectancy[is.na(All_data$Malelifeexpectancy)] <- mean(All_data$Malelifeexpectancy, na.rm = TRUE)
+All_data$Femalelifeexpectancy[is.na(All_data$Femalelifeexpectancy)] <- mean(All_data$Femalelifeexpectancy, na.rm = TRUE)
+All_data$Children[is.na(All_data$Children)] <- mean(All_data$Children, na.rm = TRUE)
+All_data$Greaterthan65[is.na(All_data$Greaterthan65)] <- mean(All_data$Greaterthan65, na.rm = TRUE)
+All_data$nonwhite[is.na(All_data$nonwhite)] <- mean(All_data$nonwhite, na.rm = TRUE)
+All_data$NotBorninUK[is.na(All_data$NotBorninUK)] <- mean(All_data$NotBorninUK, na.rm = TRUE)
+All_data$NotEnglishspeaking[is.na(All_data$NotEnglishspeaking)] <- mean(All_data$NotEnglishspeaking, na.rm = TRUE)
+#Mean imputation got it down from 219 to 165 NAs
+sum(is.na(All_data))
+
+#Multiple Imputation 
+All_DataNONA <- mice(All_data,m=10,maxit=50,meth='pmm')
+summary(All_DataNONA)
+#Checking missing values on multiple imputation, reduced from 165 to 138
+# This makes sense to me bc some of the NAs are like place names and shit which can't be imputed. 
+completeData <- complete(All_DataNONA,2)
+sum(is.na(completeData))
+
+#Now all that's left is to build the predictive model (unless you wanna try getting NAs down more but idk):
 
