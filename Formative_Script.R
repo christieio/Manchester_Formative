@@ -168,5 +168,8 @@ summary(All_DataNONA)
 completeData <- complete(All_DataNONA,2)
 sum(is.na(completeData))
 
+#Turns out we have 23 rows of missing data left, Tom had 10 rows left but Tom was better than us so it makes sense. 
+sum(!complete.cases(All_data))
+
 #Now all that's left is to build the predictive model (unless you wanna try getting NAs down more but idk):
 
