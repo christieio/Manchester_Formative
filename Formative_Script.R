@@ -170,6 +170,11 @@ sum(is.na(completeData))
 
 #Turns out we have 23 rows of missing data left, Tom had 10 rows left but Tom was better than us so it makes sense. 
 sum(!complete.cases(All_data))
+#Below tells you which rows are missing
+which(rowSums(is.na(All_data))>0)
+
+#Which rows:
+#55,56,117, 251, 294, 352, 353, 372, 385, 386, 401, 402, 443, 480, 492, 500, 535, 541, 556, 557, 594, 616
 
 #Now all that's left is to build the predictive model (unless you wanna try getting NAs down more but idk):
 
