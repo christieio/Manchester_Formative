@@ -16,6 +16,8 @@ library(corrplot)
 #install.packages("VIM")
 library(VIM)
 
+setwd("C:/Users/Harri/Documents/Manchester/Manchester_Formative")
+
 #Read in data sets
 London_Dist <- read.csv("London District codes.csv")
 London_Demo <- read.table("London ward data demographics.dat", header = TRUE, sep = '\t')
@@ -227,6 +229,11 @@ sum(is.na(All_data))
 # Checking missing data
 Missing_Data <- All_data[rowSums(is.na(All_data)) > 0,] # 8 rows of missing data 
 
+#Turns out we have 23 rows of missing data left, Tom had 10 rows left but Tom was better than us so it makes sense. 
+sum(!complete.cases(All_data))
+#Below tells you which rows are missing
+which(rowSums(is.na(All_data))>0)
+Missing_Data <- All_data[rowSums(is.na(All_data)) > 0,] # 8 rows of missing data
 
 
 #Multiple Imputation 
@@ -237,16 +244,11 @@ summary(All_DataNONA)
 completeData <- complete(All_DataNONA,2)
 sum(is.na(completeData)) # This has been reduced to 9
 
-#Turns out we have 23 rows of missing data left, Tom had 10 rows left but Tom was better than us so it makes sense. 
-sum(!complete.cases(All_data))
-#Below tells you which rows are missing
-which(rowSums(is.na(All_data))>0)
-Missing_Data <- All_data[rowSums(is.na(All_data)) > 0,] # 8 rows of missing data
 
 #Which rows:
 #3 395 403 412 490 492 536 557
 
 #Now all that's left is to build the predictive model (unless you wanna try getting NAs down more but idk):
-predmodel <- with(data = All_DataNONA, exp = lm( ~ Span + Gest + NonD))
+predmodel <- with(data = All_DataNONA, exp = lm(Femalelifeexpectancy ~ Noqual + JobSeekers + Crimerate + Openspace + nonwhite + hhSocialRented + Carsperhousehold))
 combine <- pool(predmodel)
 summary(combine)
