@@ -247,4 +247,6 @@ Missing_Data <- All_data[rowSums(is.na(All_data)) > 0,] # 8 rows of missing data
 #3 395 403 412 490 492 536 557
 
 #Now all that's left is to build the predictive model (unless you wanna try getting NAs down more but idk):
-
+predmodel <- with(data = All_DataNONA, exp = lm( ~ Span + Gest + NonD))
+combine <- pool(predmodel)
+summary(combine)
